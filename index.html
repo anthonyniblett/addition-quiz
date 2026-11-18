@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Daddy's unbelievably fun addition quiz</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --sun:#FFD23F; --sun-deep:#F5B700; --ink:#1D2B6B; --paper:#FFFDF5;
+  --go:#18A558; --go-pale:#CDEFD9; --stop:#E23D4B; --stop-pale:#FAD3D6; --sky:#5BC0EB;
+}
+*{box-sizing:border-box}
+html,body{height:100%;margin:0}
+body{
+  font-family:"Fredoka",ui-rounded,"Arial Rounded MT Bold",system-ui,sans-serif;
+  color:var(--ink);background:var(--sun);
+  background-image:radial-gradient(circle at 12px 12px,var(--sun-deep) 3px,transparent 3.5px);
+  background-size:36px 36px;
+  display:flex;flex-direction:column;align-items:center;padding:18px 12px 24px;
+}
+header{text-align:center;margin-bottom:14px}
+h1{font-size:clamp(1.5rem,4.4vw,2.7rem);font-weight:700;line-height:1.05;margin:0;letter-spacing:-.01em;
+  text-shadow:3px 3px 0 var(--paper)}
+header p{font-size:clamp(1rem,2.4vw,1.35rem);font-weight:500;margin:.35em 0 0}
+.stage{display:flex;align-items:stretch;gap:clamp(8px,2.5vw,28px);width:100%;max-width:860px;flex:1;min-height:0}
+.meter{display:flex;flex-direction:column;align-items:center;width:clamp(44px,9vw,84px);flex:none}
+.meter .count{margin-top:12px;font-size:clamp(1.4rem,4vw,2.2rem);font-weight:700;line-height:1}
+.meter .name{font-size:clamp(.75rem,1.8vw,1rem);font-weight:600;margin-bottom:6px}
+.tube{flex:1;width:100%;min-height:300px;background:var(--paper);border:4px solid var(--ink);border-radius:16px;
+  padding:5px;display:flex;flex-direction:column-reverse;gap:3px;box-shadow:5px 5px 0 var(--ink)}
+.tube i{flex:1;border-radius:5px;background:transparent;transform-origin:bottom;transition:background .15s}
+.right .tube{background:var(--go-pale)} .wrong .tube{background:var(--stop-pale)}
+.right .tube i.on{background:var(--go)} .wrong .tube i.on{background:var(--stop)}
+.tube i.pop{animation:pop .45s cubic-bezier(.3,1.8,.5,1)}
+@keyframes pop{from{transform:scaleY(0)}to{transform:scaleY(1)}}
+.card{flex:1;min-width:0;background:var(--paper);border:4px solid var(--ink);border-radius:26px;
+  box-shadow:7px 7px 0 var(--ink);padding:clamp(14px,3vw,26px);display:flex;flex-direction:column;align-items:center;justify-content:center}
+.progress{font-weight:600;font-size:1.1rem;margin-bottom:6px}
+svg.clock{width:clamp(120px,24vw,170px);height:auto;display:block}
+.left-text{font-weight:600;font-size:1rem;margin:4px 0 10px;min-height:1.3em}
+.left-text.hurry{color:var(--stop)}
+.sum{display:inline-grid;grid-template-columns:auto auto;column-gap:.35em;justify-items:end;align-items:baseline;
+  font-size:clamp(2.2rem,8.5vw,4rem);font-weight:600;line-height:1.08;font-variant-numeric:tabular-nums;letter-spacing:.06em}
+.sum .rule{grid-column:1/-1;justify-self:stretch;height:5px;border-radius:3px;background:var(--ink);margin:.12em 0 .18em}
+.sum input{grid-column:1/-1;justify-self:stretch;width:6.2ch;font:inherit;color:inherit;letter-spacing:inherit;text-align:right;
+  background:#fff;border:4px solid var(--ink);border-radius:14px;padding:.02em .18em;outline:none;caret-color:var(--sky)}
+.sum input:focus{box-shadow:0 0 0 5px var(--sky)}
+.sum input.ok{background:var(--go-pale);border-color:var(--go)}
+.sum input.no{background:var(--stop-pale);border-color:var(--stop)}
+.msg{min-height:1.7em;margin-top:10px;font-size:clamp(1.05rem,2.8vw,1.4rem);font-weight:600;text-align:center}
+.msg.ok{color:var(--go)} .msg.no{color:var(--stop)}
+button{font:inherit;font-weight:700;font-size:1.3rem;color:var(--ink);background:var(--sky);border:4px solid var(--ink);
+  border-radius:16px;padding:.5em 1.3em;cursor:pointer;box-shadow:4px 4px 0 var(--ink)}
+button:active{transform:translate(3px,3px);box-shadow:1px 1px 0 var(--ink)}
+button:focus-visible{outline:4px solid var(--paper);outline-offset:3px}
+.enter{margin-top:10px;font-size:1.05rem;background:var(--sun)}
+.screen{display:none;flex-direction:column;align-items:center;text-align:center;width:100%}
+.screen.show{display:flex}
+.big{font-size:clamp(1.6rem,5vw,2.6rem);font-weight:700;line-height:1.1;margin:0 0 .3em}
+.rules{font-size:1.15rem;font-weight:500;line-height:1.5;margin:0 0 1.1em;max-width:26em}
+.score{font-size:clamp(4rem,16vw,7rem);font-weight:700;line-height:1;margin:.05em 0}
+@media (prefers-reduced-motion:reduce){.tube i.pop{animation:none}}
+</style>
+</head>
+<body>
+<header>
+  <h1>Daddy's unbelievably fun addition quiz</h1>
+  <p>Can you get 20 questions right?</p>
+</header>
+
+<div class="stage">
+  <div class="meter wrong" aria-label="Wrong answers">
+    <div class="name">Wrong</div>
+    <div class="tube" id="tubeWrong"></div>
+    <div class="count" id="nWrong">0</div>
+  </div>
+
+  <main class="card">
+    <section class="screen show" id="sStart">
+      <p class="big">Ready?</p>
+      <p class="rules">20 addition questions. You get one minute for each one. Type your answer and press Enter.</p>
+      <button id="bStart">Start the quiz</button>
+    </section>
+
+    <section class="screen" id="sPlay">
+      <div class="progress" id="progress">Question 1 of 20</div>
+      <svg class="clock" viewBox="0 0 200 200" role="img" aria-label="Countdown clock">
+        <circle cx="100" cy="100" r="92" fill="#fff" stroke="#1D2B6B" stroke-width="8"/>
+        <path id="wedge" fill="#5BC0EB"/>
+        <g id="ticks" stroke="#1D2B6B" stroke-linecap="round"></g>
+        <g font-family="Fredoka,sans-serif" font-weight="700" font-size="20" fill="#1D2B6B" text-anchor="middle">
+          <text x="100" y="45">60</text><text x="163" y="107">15</text><text x="100" y="170">30</text><text x="37" y="107">45</text>
+        </g>
+        <line id="hand" x1="100" y1="112" x2="100" y2="24" stroke="#1D2B6B" stroke-width="7" stroke-linecap="round"/>
+        <circle cx="100" cy="100" r="9" fill="#1D2B6B"/>
+      </svg>
+      <div class="left-text" id="leftText" aria-live="off">60 seconds left</div>
+      <form id="form" autocomplete="off">
+        <div class="sum">
+          <span></span><span id="a">0</span>
+          <span>+</span><span id="b">0</span>
+          <span class="rule"></span>
+          <input id="ans" type="text" inputmode="numeric" pattern="[0-9]*" maxlength="6" aria-label="Your answer" autocomplete="off">
+        </div>
+        <div><button class="enter" type="submit">Enter</button></div>
+      </form>
+      <div class="msg" id="msg" aria-live="polite"></div>
+    </section>
+
+    <section class="screen" id="sEnd">
+      <p class="big" id="endTitle"></p>
+      <div class="score" id="endScore"></div>
+      <p class="rules" id="endLine"></p>
+      <button id="bAgain">Play again</button>
+    </section>
+  </main>
+
+  <div class="meter right" aria-label="Right answers">
+    <div class="name">Right</div>
+    <div class="tube" id="tubeRight"></div>
+    <div class="count" id="nRight">0</div>
+  </div>
+</div>
+
+<script>
+const BANK = [[9552,693],[7895,463],[579,2546],[9122,335],[8726,4715],[5150,94],[8086,5817],[2817,168],[7461,2523],[7671,5414],[6304,6007],[4200,854],[3393,684],[6098,982],[353,1636],[1470,5555],[6153,693],[5818,2802],[6527,830],[5016,9008],[7626,5951],[7911,521],[4448,424],[1920,3642],[6914,3786],[929,2999],[6006,3885],[9761,3381],[3387,659],[371,5900],[607,2625],[5029,7981],[2241,67],[4218,5521],[2337,2568],[741,123],[619,8160],[8934,3697],[7247,6178],[847,9575],[5500,1443],[2317,7211],[9322,9331],[3373,6433],[744,4322],[9092,911],[3058,953],[1996,9736],[1175,356],[4283,861],[7588,709],[8273,444],[3915,2202],[5967,706],[4909,5574],[3650,958],[3776,1288],[4788,3291],[209,826],[3368,4556],[832,771],[9301,6657],[3131,1712],[7197,826],[1680,8865],[2352,9820],[1360,5107],[854,710],[4432,663],[317,698],[7193,2725],[7344,433],[922,2123],[4461,4828],[8422,830],[698,7547],[487,8545],[4407,1944],[6681,450],[7998,4541],[6164,913],[4323,8833],[4493,241],[9158,9691],[8985,671],[8670,87],[1711,671],[5605,6881],[1613,49],[4514,4798],[2878,6319],[2731,6316],[9491,4414],[209,7063],[3893,4903],[7973,2040],[2787,199],[1940,2034],[9315,924],[2427,6791],[9313,9776],[254,677],[9460,5508],[6122,956],[3146,8586],[6704,271],[181,239],[3957,5185],[864,108],[1296,4688],[3374,3918],[8934,2066],[4289,7478],[5060,2464],[6124,6202],[6507,2328],[939,691],[1991,968],[971,2378],[2831,5840],[3709,777],[780,1769],[4488,310],[1188,7872],[6071,6354],[354,1669],[4633,5462],[5563,5634],[9748,286],[776,3578],[714,545],[9453,20],[9431,3507],[1374,11],[228,9133],[8391,9572],[386,816],[6764,318],[6249,3782],[8664,720],[4920,2163],[4830,392],[7816,475],[3384,7732],[4198,537],[876,3792],[1268,384],[9831,598],[8742,5339],[5381,25],[4909,2167],[2645,403],[3452,620],[5167,4142],[929,1453],[8005,691],[5425,395],[1148,3423],[1211,3216],[8784,7749],[8274,234],[1845,790],[4439,764],[694,7971],[6832,560],[121,7641],[8606,9476],[6010,9236],[5853,1358],[5082,964],[6408,5200],[596,311],[8110,8726],[9340,4729],[281,942],[4233,282],[129,8566],[689,117],[413,7759],[334,4992],[683,357],[8878,8797],[2163,1041],[3793,7400],[7816,566],[9242,4624],[6950,1106],[8181,8313],[947,581],[390,653],[1436,227],[7062,1103],[6425,221],[9090,5743],[1899,1104],[6779,8608],[2197,519],[4182,662],[125,6463],[297,740],[624,4622],[3446,997],[7718,561],[6871,75],[665,890],[881,7875],[3089,504],[5404,467],[7163,6082],[4857,25],[4036,8618],[7942,7969],[448,186],[627,3489],[5677,846],[661,2101],[4054,900],[7927,209],[9257,89],[1695,2714],[5491,6032],[5931,3655],[5375,36],[7762,5669],[7894,150],[3656,944],[7963,194],[3478,4546],[608,6995],[9146,639],[9523,5586],[8167,9313],[8488,3953],[421,6459],[9834,848],[2754,9095],[4338,6617],[9859,6310],[7837,704],[7526,5417],[2219,681],[9104,7938],[6780,915],[1908,813],[1019,777],[1382,743],[7212,148],[7727,2358],[5899,161],[408,9085],[5845,6607],[1695,4903],[1572,4048],[768,3896],[4378,251],[7756,5160],[7691,1458],[9879,253],[2511,829],[238,514],[5442,9698],[2566,8388],[3588,5811],[3996,380],[1476,112],[7157,5591],[346,815],[3143,8065],[7271,985],[1056,4755],[939,3082],[3646,4428],[5377,9400],[5378,4060],[390,5541],[8671,6091],[1819,979],[2077,4959],[677,916],[5422,327],[8652,401],[1680,2456],[3597,8250],[9473,544],[8917,5681],[1012,3413],[9585,3742],[613,7538],[1535,588],[4007,1622],[3000,5483],[6586,36],[139,342],[3796,197],[3841,2383],[1528,676],[5958,7492],[4434,330],[3999,199],[110,8726],[877,963],[9397,7872],[3398,9589],[4401,842],[823,9532],[7613,1186],[3877,147],[3739,410],[7886,620],[6001,925],[8491,5052],[213,684],[439,318],[726,6182],[3179,2287],[6351,513],[128,5778],[2805,9392],[6975,7110],[4472,777],[2645,917],[3076,6755],[2936,9773],[438,5959],[601,309],[374,9098],[676,1126],[3418,851],[1160,7115],[1302,567],[3171,6853],[3895,951],[215,351],[8828,6913],[222,389],[8581,6314],[982,168],[1383,2721],[2973,2042],[3499,2519],[4400,4692],[7289,815],[6455,7257],[4086,3194],[3986,5753],[629,928],[524,3368],[9381,4103],[8362,2156],[3268,526],[295,3336],[2337,572],[7733,406],[8708,1356],[7894,8779],[2216,2122],[732,1272],[3706,4560],[1764,608],[6721,3455],[4542,328],[512,3882],[9749,813],[6615,6267],[6594,556],[7894,2239],[8741,71],[7727,200],[6209,2427],[741,648],[4507,492],[743,2222],[365,3949],[3589,343],[6720,7885],[8179,3026],[888,3468],[2718,199],[6888,247],[8570,362],[5439,3924],[1114,4543],[957,8510],[659,4189],[7782,9763],[1890,634],[1280,1878],[3014,367],[2286,722],[6825,2580],[221,264],[2816,9244],[7273,4219],[5350,91],[461,188],[259,3097],[3125,8980],[474,3875],[651,8708],[7788,369],[2573,533],[4692,96],[1192,594],[1901,5176],[483,208],[1421,6532],[2419,3472],[7798,4615],[223,8879],[2219,1744],[3785,2502],[4566,526],[5006,1030],[1260,779],[1728,613],[2848,674],[8571,1062],[9900,7434],[2770,834],[9716,626],[9907,1876],[7192,8640],[5229,4246],[7854,9820],[8628,4076],[6112,1035],[2984,7479],[397,9099],[1337,3044],[9836,6397],[7793,61],[963,8927],[1464,7934],[5910,505],[885,9144],[7393,3361],[1839,8616],[2046,273],[663,5122],[6870,562],[6401,651],[9658,44],[117,5145],[4737,425],[8279,9673],[897,3523],[4354,537],[3966,8822],[5370,3984],[6519,2815],[4412,5512],[111,497],[9113,5371],[370,354],[2858,551],[3716,1873],[3677,3942],[1932,6654],[1277,9861],[9588,403],[7259,4851],[9641,4706],[7524,3840],[834,1758],[7396,435],[7157,6862],[2178,181],[5785,7429],[1483,154],[1542,112],[9601,9442],[7827,654],[6811,9631],[375,386],[818,6235],[3420,3477],[5741,1340],[8203,485],[5073,194],[7155,6872],[739,506],[1913,241],[8534,9075],[2563,971],[1812,424],[8330,31],[6809,798],[952,8799],[3875,7314],[2599,864],[9537,20],[4435,447],[1587,75],[3103,5063],[7618,369],[1734,9657],[3510,7579],[3166,371],[7172,3552],[525,9348]];           // 500 questions: [first number, second number]
+const TOTAL = 20, SECONDS = 60;
+const $ = id => document.getElementById(id);
+const fmt = n => n.toLocaleString("en-US");
+
+for (const id of ["tubeWrong","tubeRight"]) for (let i=0;i<TOTAL;i++) $(id).appendChild(document.createElement("i"));
+const ticks = $("ticks");
+for (let i=0;i<60;i++){
+  const big = i%5===0, a = i*6*Math.PI/180, r1 = big?74:80, r2 = 85;
+  if (big && i%15===0) continue;
+  const l = document.createElementNS("http://www.w3.org/2000/svg","line");
+  l.setAttribute("x1",100+r1*Math.sin(a)); l.setAttribute("y1",100-r1*Math.cos(a));
+  l.setAttribute("x2",100+r2*Math.sin(a)); l.setAttribute("y2",100-r2*Math.cos(a));
+  l.setAttribute("stroke-width", big?4:1.5); ticks.appendChild(l);
+}
+
+let questions=[], idx=0, right=0, wrong=0, deadline=0, raf=0, locked=true;
+
+function show(id){ for (const s of document.querySelectorAll(".screen")) s.classList.toggle("show", s.id===id); }
+
+function pick(){
+  const ids = BANK.map((_,i)=>i);
+  for (let i=ids.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [ids[i],ids[j]]=[ids[j],ids[i]]; }
+  return ids.slice(0,TOTAL).map(i=>BANK[i]);
+}
+
+function start(){
+  questions = pick(); idx=0; right=0; wrong=0;
+  for (const el of document.querySelectorAll(".tube i")) el.className="";
+  $("nRight").textContent="0"; $("nWrong").textContent="0";
+  show("sPlay"); ask();
+}
+
+function ask(){
+  const [a,b] = questions[idx];
+  $("progress").textContent = `Question ${idx+1} of ${TOTAL}`;
+  $("a").textContent = fmt(a); $("b").textContent = fmt(b);
+  const inp=$("ans"); inp.value=""; inp.className=""; inp.readOnly=false;
+  $("msg").textContent=""; $("msg").className="msg";
+  locked=false; deadline = performance.now()+SECONDS*1000;
+  inp.focus(); cancelAnimationFrame(raf); tick();
+}
+
+function drawClock(leftMs){
+  const elapsed = Math.min(1, 1-leftMs/(SECONDS*1000)), deg = elapsed*360, rad = deg*Math.PI/180;
+  $("hand").setAttribute("transform",`rotate(${deg} 100 100)`);
+  const hurry = leftMs<=10000;
+  const w=$("wedge");
+  if (elapsed>=1) w.setAttribute("d","");
+  else if (elapsed<=0) w.setAttribute("d","M100 100 m-66 0 a66 66 0 1 0 132 0 a66 66 0 1 0 -132 0");
+  else { const x=100+66*Math.sin(rad), y=100-66*Math.cos(rad);
+    w.setAttribute("d",`M100 100 L${x} ${y} A66 66 0 ${deg<180?1:0} 1 100 34 Z`); }
+  w.setAttribute("fill", hurry?"#E23D4B":"#5BC0EB");
+  const s = Math.ceil(leftMs/1000), t=$("leftText");
+  t.textContent = s===1 ? "1 second left" : `${s} seconds left`;
+  t.classList.toggle("hurry",hurry);
+}
+
+function tick(){
+  const left = Math.max(0, deadline-performance.now());
+  drawClock(left);
+  if (left<=0){ finish(false,true); return; }
+  raf = requestAnimationFrame(tick);
+}
+
+function finish(ok,timedOut){
+  if (locked) return; locked=true; cancelAnimationFrame(raf);
+  const [a,b]=questions[idx], inp=$("ans"), msg=$("msg");
+  inp.readOnly=true;
+  const tube = $(ok?"tubeRight":"tubeWrong"), n = ok? ++right : ++wrong;
+  const seg = tube.children[n-1]; seg.classList.add("on","pop");
+  $(ok?"nRight":"nWrong").textContent = n;
+  if (ok){ inp.classList.add("ok"); msg.textContent="Correct!"; msg.className="msg ok"; }
+  else { inp.classList.add("no");
+    msg.textContent = (timedOut?"Time's up. ":"Not quite. ")+`${fmt(a)} + ${fmt(b)} = ${fmt(a+b)}`; msg.className="msg no"; }
+  setTimeout(()=>{ idx++; idx<TOTAL ? ask() : end(); }, ok?1000:2800);
+}
+
+function end(){
+  $("endScore").textContent = `${right} / ${TOTAL}`;
+  $("endTitle").textContent = right===TOTAL ? "You did it! All 20 right!" : right>=16 ? "So close!" : right>=10 ? "Good work!" : "Quiz finished";
+  $("endLine").textContent = right===TOTAL ? "Daddy is unbelievably impressed." : `You got ${right} right. Can you get all 20 next time?`;
+  show("sEnd"); $("bAgain").focus();
+}
+
+$("ans").addEventListener("input",e=>{ e.target.value = e.target.value.replace(/\D/g,""); });
+$("form").addEventListener("submit",e=>{
+  e.preventDefault(); if (locked) return;
+  const v=$("ans").value; if (v===""){ $("ans").focus(); return; }
+  const [a,b]=questions[idx]; finish(Number(v)===a+b,false);
+});
+document.addEventListener("pointerdown",()=>{ if(!locked) setTimeout(()=>$("ans").focus(),0); });
+$("bStart").addEventListener("click",start);
+$("bAgain").addEventListener("click",start);
+</script>
+</body>
+</html>
